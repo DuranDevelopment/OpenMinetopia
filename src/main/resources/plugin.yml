@@ -1,0 +1,4 @@
+name: OpenMinetopia
+version: '${project.version}'
+main: nl.openminetopia.OpenMinetopia
+api-version: '1.20'
