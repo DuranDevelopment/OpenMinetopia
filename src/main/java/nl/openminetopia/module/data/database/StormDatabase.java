@@ -29,8 +29,6 @@ public class StormDatabase {
     private @Getter Storm storm;
     private final static @Getter ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-    private final String currentDirectory = System.getProperty("user.dir");
-
     private StormDatabase() {
         // Private constructor to prevent instantiation
     }
@@ -58,7 +56,7 @@ public class StormDatabase {
 
         if (type.equalsIgnoreCase("sqlite")) {
             Class.forName("org.sqlite.JDBC");
-            storm = new Storm(new SqliteFileDriver(new File(currentDirectory, "database.db")));
+            storm = new Storm(new SqliteFileDriver(new File(OpenMinetopia.getInstance().getDataFolder(), "database.db")));
         } else {
             Class.forName("com.mysql.cj.jdbc.MysqlDataSource");
             config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + name);
