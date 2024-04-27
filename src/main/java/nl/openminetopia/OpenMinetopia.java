@@ -22,6 +22,7 @@ public final class OpenMinetopia extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        saveDefaultConfig();
         commandManager = new PaperCommandManager(this);
         moduleManager = new ModuleManager();
 
