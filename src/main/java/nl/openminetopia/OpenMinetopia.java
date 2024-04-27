@@ -4,6 +4,7 @@ import co.aikar.commands.MessageType;
 import co.aikar.commands.PaperCommandManager;
 import lombok.Getter;
 import nl.openminetopia.module.ModuleManager;
+import nl.openminetopia.module.banking.BankingModule;
 import nl.openminetopia.module.data.DataModule;
 import nl.openminetopia.module.player.PlayerModule;
 import org.bukkit.ChatColor;
@@ -24,7 +25,13 @@ public final class OpenMinetopia extends JavaPlugin {
         commandManager = new PaperCommandManager(this);
         moduleManager = new ModuleManager();
 
-        moduleManager.register(new DataModule(), new PlayerModule());
+        moduleManager.register(
+                new DataModule(),
+                new PlayerModule(),
+                new BankingModule()
+        );
+
+        moduleManager.enable();
 
         commandManager.enableUnstableAPI("help");
         commandManager.setFormat(MessageType.HELP, ChatColor.DARK_AQUA);
