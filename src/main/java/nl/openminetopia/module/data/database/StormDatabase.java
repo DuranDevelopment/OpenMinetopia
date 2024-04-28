@@ -42,10 +42,7 @@ public class StormDatabase {
 
     // TODO: Add configurable database credentials, keeping it static for testing now
 
-    public void init() throws SQLException, ClassNotFoundException {
-
-        // TODO: Remove this once config is done
-        String type = "SQLITE";
+    public void initMySQL() throws SQLException {
         String host = "localhost";
         int port = 3306;
         String name = "test";
@@ -53,28 +50,25 @@ public class StormDatabase {
         String password = "test";
 
         HikariConfig config = new HikariConfig();
-
-        if (type.equalsIgnoreCase("sqlite")) {
-            Class.forName("org.sqlite.JDBC");
-            storm = new Storm(new SqliteFileDriver(new File(OpenMinetopia.getInstance().getDataFolder(), "database.db")));
-        } else {
-            Class.forName("com.mysql.cj.jdbc.MysqlDataSource");
-            config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + name);
-            config.setUsername(username);
-            config.setPassword(password);
-            storm = new Storm(new HikariDriver(config));
-        }
-
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        config.addDataSourceProperty("jdbcCompliantTruncation", "false");
-        config.setPoolName("OpenMinetopiaPool");
+        config.setJdbcUrl("jdbc:mysql://" + host + ":" + port + "/" + name);
+        config.setUsername(username);
+        config.setPassword(password);
+        storm = new Storm(new HikariDriver(config));
 
         storm.registerModel(new PlayerModel());
         storm.runMigrations();
 
-        OpenMinetopia.getInstance().getLogger().info("Successfully connected to the database.");
+        OpenMinetopia.getInstance().getLogger().info("Successfully connected to the database. (Using: " + DatabaseType.MYSQL.getDisplayName() + ")");
+    }
+
+    public void initSqlite() throws SQLException, ClassNotFoundException {
+        Class.forName(DatabaseType.SQLITE.getDriver());
+        storm = new Storm(new SqliteFileDriver(new File(OpenMinetopia.getInstance().getDataFolder(), "database.db")));
+
+        storm.registerModel(new PlayerModel());
+        storm.runMigrations();
+
+        OpenMinetopia.getInstance().getLogger().info("Successfully connected to the database. (Using: " + DatabaseType.SQLITE.getDisplayName() + ")");
     }
 
     public CompletableFuture<Optional<PlayerModel>> findPlayerModel(@NotNull UUID uuid) {
