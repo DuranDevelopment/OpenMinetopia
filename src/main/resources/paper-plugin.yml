@@ -1,4 +1,5 @@
 name: OpenMinetopia
 version: '${project.version}'
 main: nl.openminetopia.OpenMinetopia
+loader: nl.openminetopia.OpenMinetopiaLoader
 api-version: '1.20'
