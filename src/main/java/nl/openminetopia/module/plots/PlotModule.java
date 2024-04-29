@@ -15,6 +15,7 @@ public class PlotModule extends Module {
         registerCommand(new PlotCreateCommand());
         registerCommand(new PlotDeleteCommand());
         registerCommand(new PlotDescriptionCommand());
+        registerCommand(new PlotListCommand());
     }
 
     @Override
