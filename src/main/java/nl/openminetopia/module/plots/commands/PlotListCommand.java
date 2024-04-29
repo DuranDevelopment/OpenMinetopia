@@ -2,6 +2,7 @@ package nl.openminetopia.module.plots.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -20,6 +21,7 @@ import java.util.List;
 public class PlotListCommand extends BaseCommand {
 
     @Subcommand("list")
+    @CommandPermission("openminetopia.plot.list")
     public void listCommand(Player player, @Optional Integer page) {
         World world = BukkitAdapter.adapt(player.getWorld());
 
@@ -32,7 +34,6 @@ public class PlotListCommand extends BaseCommand {
         }
 
         Collection<String> regionNames = manager.getRegions().keySet();
-        regionNames.remove("__global__");
 
         int pageSize = 15;
         int totalPages = (int) Math.ceil(regionNames.size() / (double) pageSize);

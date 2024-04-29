@@ -9,6 +9,7 @@ public class PlotModule extends Module {
     public void enable() {
         registerCommand(new PlotInfoCommand());
 
+        registerCommand(new PlotCommand());
         registerCommand(new PlotMembersCommand());
         registerCommand(new PlotOwnersCommand());
         registerCommand(new PlotClearCommand());
