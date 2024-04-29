@@ -33,16 +33,12 @@ public final class OpenMinetopia extends JavaPlugin {
         commandManager = new PaperCommandManager(this);
         moduleManager = new ModuleManager();
 
-        moduleManager.register();
-
         moduleManager.register(
                 new DataModule(),
                 new PlayerModule(),
                 new BankingModule(),
                 new PlotModule()
         );
-
-        moduleManager.enable();
 
         commandManager.enableUnstableAPI("help");
         commandManager.setFormat(MessageType.HELP, ChatColor.DARK_AQUA);
