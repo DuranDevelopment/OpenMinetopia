@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import nl.openminetopia.OpenMinetopia;
+import nl.openminetopia.module.data.database.models.BankAccountModel;
 import nl.openminetopia.module.data.database.models.PlayerModel;
 import nl.openminetopia.module.player.manager.PlayerManager;
 import org.bukkit.Bukkit;
@@ -66,6 +67,7 @@ public class StormDatabase {
         storm = new Storm(new SqliteFileDriver(new File(OpenMinetopia.getInstance().getDataFolder(), "database.db")));
 
         storm.registerModel(new PlayerModel());
+        storm.registerModel(new BankAccountModel());
         storm.runMigrations();
 
         OpenMinetopia.getInstance().getLogger().info("Successfully connected to the database. (Using: " + DatabaseType.SQLITE.getDisplayName() + ")");
