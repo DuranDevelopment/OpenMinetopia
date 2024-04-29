@@ -3,6 +3,7 @@ package nl.openminetopia.module.plots.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Description;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.kyori.adventure.text.Component;
 import nl.openminetopia.utils.MessageUtils;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 public class PlotInfoCommand extends BaseCommand {
 
     @Default
+    @Description("Bekijk informatie van een plot.")
     public void plotInfo(Player player) {
         ProtectedRegion region = WorldGuardUtils.getTopRegion(player.getLocation());
 

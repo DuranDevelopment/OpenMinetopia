@@ -3,6 +3,7 @@ package nl.openminetopia.module.plots.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandPermission;
+import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
@@ -28,6 +29,7 @@ public class PlotCreateCommand extends BaseCommand {
 
     @Subcommand("create")
     @CommandPermission("openminetopia.plot.create")
+    @Description("Maak een plot aan.")
     public void plotCreate(Player player, String name, boolean topToDown) {
         BukkitPlayer bukkitPlayer = BukkitAdapter.adapt(player);
         World bukkitWorld = player.getWorld();
