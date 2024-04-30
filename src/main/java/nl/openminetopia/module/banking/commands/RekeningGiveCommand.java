@@ -29,7 +29,7 @@ public class RekeningGiveCommand extends BaseCommand {
                 throwable.printStackTrace();
                 return;
             }
-            player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol <aqua>" + amount + "<dark_aqua> toegevoegd aan de rekening met ID: <aqua>" + id));
+            player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol <aqua>€" + amount + "<dark_aqua> toegevoegd aan de rekening met ID: <aqua>" + id));
         });
     }
 }
