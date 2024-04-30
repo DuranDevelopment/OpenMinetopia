@@ -5,11 +5,16 @@ import com.craftmend.storm.api.StormModel;
 import com.craftmend.storm.api.enums.Where;
 import com.craftmend.storm.connection.hikaricp.HikariDriver;
 import com.craftmend.storm.connection.sqlite.SqliteFileDriver;
+import com.craftmend.storm.parser.types.TypeRegistry;
 import com.zaxxer.hikari.HikariConfig;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import nl.openminetopia.OpenMinetopia;
+import nl.openminetopia.api.banking.enums.AccountType;
+import nl.openminetopia.module.data.database.adapters.AccountTypeAdapter;
+import nl.openminetopia.module.data.database.models.BankAccountModel;
+import nl.openminetopia.module.data.database.models.BankAccountUserModel;
 import nl.openminetopia.module.data.database.models.PlayerModel;
 import nl.openminetopia.module.player.manager.PlayerManager;
 import org.bukkit.Bukkit;
@@ -56,6 +61,8 @@ public class StormDatabase {
         storm = new Storm(new HikariDriver(config));
 
         storm.registerModel(new PlayerModel());
+        storm.registerModel(new BankAccountModel());
+        storm.registerModel(new BankAccountUserModel());
         storm.runMigrations();
 
         OpenMinetopia.getInstance().getLogger().info("Successfully connected to the database. (Using: " + DatabaseType.MYSQL.getDisplayName() + ")");
@@ -65,7 +72,11 @@ public class StormDatabase {
         Class.forName(DatabaseType.SQLITE.getDriver());
         storm = new Storm(new SqliteFileDriver(new File(OpenMinetopia.getInstance().getDataFolder(), "database.db")));
 
+        TypeRegistry.registerAdapter(AccountType.class, new AccountTypeAdapter());
+
         storm.registerModel(new PlayerModel());
+        storm.registerModel(new BankAccountModel());
+        storm.registerModel(new BankAccountUserModel());
         storm.runMigrations();
 
         OpenMinetopia.getInstance().getLogger().info("Successfully connected to the database. (Using: " + DatabaseType.SQLITE.getDisplayName() + ")");

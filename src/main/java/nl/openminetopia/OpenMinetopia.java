@@ -8,7 +8,7 @@ import nl.openminetopia.module.banking.BankingModule;
 import nl.openminetopia.module.data.DataModule;
 import nl.openminetopia.module.player.PlayerModule;
 import nl.openminetopia.module.plots.PlotModule;
-import nl.openminetopia.utils.WorldGuardUtils;
+import nl.openminetopia.utils.GUIHolder;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,11 +20,6 @@ public final class OpenMinetopia extends JavaPlugin {
     private static ModuleManager moduleManager;
     @Getter
     private static PaperCommandManager commandManager;
-
-    @Override
-    public void onLoad() {
-        WorldGuardUtils.loadFlags();
-    }
 
     @Override
     public void onEnable() {
@@ -42,6 +37,8 @@ public final class OpenMinetopia extends JavaPlugin {
 
         commandManager.enableUnstableAPI("help");
         commandManager.setFormat(MessageType.HELP, ChatColor.DARK_AQUA);
+
+        GUIHolder.init(this);
     }
 
     @Override
