@@ -3,6 +3,8 @@ package nl.openminetopia.module.banking.menus;
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import nl.openminetopia.api.banking.accounts.Account;
 import nl.openminetopia.api.banking.enums.AccountPermission;
+import nl.openminetopia.api.banking.events.DepositMoneyEvent;
+import nl.openminetopia.api.banking.events.WithdrawMoneyEvent;
 import nl.openminetopia.api.banking.manager.BankingManager;
 import nl.openminetopia.module.banking.BankingModule;
 import nl.openminetopia.utils.GUIHolder;
@@ -79,6 +81,9 @@ public class AccountContentMenu extends GUIHolder {
                 }
             }
 
+            WithdrawMoneyEvent withdrawMoneyEvent = new WithdrawMoneyEvent(player, value, account);
+            Bukkit.getPluginManager().callEvent(withdrawMoneyEvent);
+
             setBalance(account, balance - value);
             player.sendMessage(MessageUtils.format("<dark_aqua>Je hebt <aqua>€" + value + " <dark_aqua>opgenomen van de rekening <aqua>" + name));
             new AccountContentMenu(player, account).open(player);
@@ -100,12 +105,19 @@ public class AccountContentMenu extends GUIHolder {
                 item.setAmount(0);
 
                 player.sendMessage(MessageUtils.format("<dark_aqua>Je hebt <aqua>€" + value + " <dark_aqua>gestort naar de rekening <aqua>" + name));
+
+                DepositMoneyEvent depositMoneyEvent = new DepositMoneyEvent(player, value, null);
+                Bukkit.getPluginManager().callEvent(depositMoneyEvent);
+
                 setBalance(account, balance + value);
                 new AccountContentMenu(player, account).open(player);
                 return;
             }
 
             double value = Double.parseDouble(NBTEditor.getString(item, "openmt_banking_note"));
+
+            DepositMoneyEvent depositMoneyEvent = new DepositMoneyEvent(player, value, account);
+            Bukkit.getPluginManager().callEvent(depositMoneyEvent);
 
             setBalance(account, balance + value);
             item.setAmount(item.getAmount() - 1);

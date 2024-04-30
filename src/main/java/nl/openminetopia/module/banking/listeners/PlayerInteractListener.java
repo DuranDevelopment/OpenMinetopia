@@ -23,8 +23,12 @@ public class PlayerInteractListener implements Listener {
 
         if (event.getClickedBlock().getType() == Material.RED_SANDSTONE_STAIRS) {
             event.setCancelled(true);
+
+            ATMOpenEvent atmOpenEvent = new ATMOpenEvent(player);
+            Bukkit.getPluginManager().callEvent(atmOpenEvent);
+
+            if (atmOpenEvent.isCancelled()) return;
             new AccountTypeMenu(player).open(player);
-            Bukkit.getPluginManager().callEvent(new ATMOpenEvent(player));
         }
     }
 }
