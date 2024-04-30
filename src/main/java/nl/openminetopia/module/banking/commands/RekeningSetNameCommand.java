@@ -23,7 +23,13 @@ public class RekeningSetNameCommand extends BaseCommand {
             return;
         }
 
-        BankingManager.getInstance().setName(account, name);
-        player.sendMessage(MessageUtils.format("<dark_aqua>Rekening met ID: <aqua>" + id + " <dark_aqua>is succesvol hernoemd naar <aqua>" + name + "<dark_aqua>."));
+        BankingManager.getInstance().setName(account, name).whenComplete((aVoid, throwable) -> {
+            if (throwable != null) {
+                player.sendMessage(MessageUtils.format("<red>Er is een fout opgetreden tijdens het hernoemen van de rekening."));
+                throwable.printStackTrace();
+                return;
+            }
+            player.sendMessage(MessageUtils.format("<dark_aqua>Rekening met ID: <aqua>" + id + " <dark_aqua>is succesvol hernoemd naar <aqua>" + name + "<dark_aqua>."));
+        });
     }
 }

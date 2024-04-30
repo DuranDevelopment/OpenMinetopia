@@ -24,7 +24,13 @@ public class RekeningRemoveUserCommand extends BaseCommand {
             return;
         }
 
-        BankingManager.getInstance().removeUser(account, target.getUniqueId());
-        player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol speler <aqua>" + target.getName() + "<dark_aqua> verwijderd van de rekening met ID: <aqua>" + id));
+        BankingManager.getInstance().removeUser(account, target.getUniqueId()).whenComplete((aVoid, throwable) -> {
+            if (throwable != null) {
+                player.sendMessage(MessageUtils.format("<red>Er is een fout opgetreden tijdens het verwijderen van de speler van de rekening."));
+                throwable.printStackTrace();
+                return;
+            }
+            player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol speler <aqua>" + target.getName() + "<dark_aqua> verwijderd van de rekening met ID: <aqua>" + id));
+        });
     }
 }

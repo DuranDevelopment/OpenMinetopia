@@ -2,6 +2,7 @@ package nl.openminetopia.api.banking.manager;
 
 import com.craftmend.storm.api.enums.Where;
 import lombok.Getter;
+import nl.openminetopia.OpenMinetopia;
 import nl.openminetopia.api.banking.accounts.Account;
 import nl.openminetopia.api.banking.enums.AccountPermission;
 import nl.openminetopia.api.banking.enums.AccountType;
@@ -10,6 +11,8 @@ import nl.openminetopia.module.data.database.models.BankAccountModel;
 import nl.openminetopia.module.data.database.models.BankAccountUserModel;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 @Getter
 public class BankingManager {
@@ -18,6 +21,8 @@ public class BankingManager {
 
     public List<Account> accounts = new ArrayList<>();
 
+    private final ExecutorService executorService = StormDatabase.getExecutorService();
+
     public static BankingManager getInstance() {
         if (instance == null) {
             instance = new BankingManager();
@@ -25,109 +30,126 @@ public class BankingManager {
         return instance;
     }
 
-    public Account createAccount(AccountType accountType) {
-        int id = 0;
-        try {
-            id = StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
-                    .execute()
-                    .join()
-                    .size() + 1;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public CompletableFuture<Account> createAccount(AccountType accountType) {
+        CompletableFuture<Account> completableFuture = new CompletableFuture<>();
+        CompletableFuture.runAsync(() -> {
+            int id = 0;
+            try {
+                id = StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
+                        .execute()
+                        .join()
+                        .size() + 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-        BankAccountModel bankAccountModel = new BankAccountModel();
-        bankAccountModel.setType(accountType);
-        bankAccountModel.setBalance(0.0);
-        bankAccountModel.setFrozen(false);
-        bankAccountModel.setName("<gray>ID: " + id);
+            BankAccountModel bankAccountModel = new BankAccountModel();
+            bankAccountModel.setType(accountType);
+            bankAccountModel.setBalance(0.0);
+            bankAccountModel.setFrozen(false);
+            bankAccountModel.setName("<gray>ID: " + id);
 
-        Account account = new Account(id, accountType, "<gray>ID: ", 0, false, null);
-        accounts.add(account);
+            Account account = new Account(id, accountType, "<gray>ID: " + id, 0, false, new HashMap<>());
+            accounts.add(account);
 
-        StormDatabase.getInstance().saveStormModel(bankAccountModel);
-
-        return account;
+            StormDatabase.getInstance().saveStormModel(bankAccountModel);
+            completableFuture.complete(account);
+        }, executorService);
+        return completableFuture;
     }
 
-    public void deleteAccount(Account account) {
+    public CompletableFuture<Void> deleteAccount(Account account) {
         accounts.remove(account);
 
-        try {
-            Collection<BankAccountModel> accountModel =
-                    StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
-                            .where("id", Where.EQUAL, account.getId())
-                            .limit(1)
-                            .execute()
-                            .join();
-            StormDatabase.getInstance().getStorm().delete(accountModel.iterator().next());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Collection<BankAccountModel> accountModel =
+                        StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
+                                .where("id", Where.EQUAL, account.getId())
+                                .limit(1)
+                                .execute()
+                                .join();
+                StormDatabase.getInstance().getStorm().delete(accountModel.iterator().next());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executorService);
     }
 
-    public void addUser(Account account, UUID uuid, AccountPermission permission) {
+    public CompletableFuture<Void> addUser(Account account, UUID uuid, AccountPermission permission) {
         account.getUsers().put(uuid, permission);
 
-        BankAccountUserModel bankAccountUserModel = new BankAccountUserModel();
-        bankAccountUserModel.setAccountId(account.getId());
-        bankAccountUserModel.setUuid(uuid);
-        bankAccountUserModel.setAccountPermission(permission.name());
-        StormDatabase.getInstance().saveStormModel(bankAccountUserModel);
+        return CompletableFuture.runAsync(() -> {
+            try {
+                BankAccountUserModel bankAccountUserModel = new BankAccountUserModel();
+                bankAccountUserModel.setAccountId(account.getId());
+                bankAccountUserModel.setUuid(uuid);
+                bankAccountUserModel.setAccountPermission(permission.name());
+                StormDatabase.getInstance().saveStormModel(bankAccountUserModel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executorService);
     }
 
-    public void setName(Account account, String name) {
+    public CompletableFuture<Void> setName(Account account, String name) {
         account.setName(name);
 
-        try {
-            Collection<BankAccountModel> accountModel =
-                    StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
-                            .where("id", Where.EQUAL, account.getId())
-                            .limit(1)
-                            .execute()
-                            .join();
-            BankAccountModel bankAccountModel = accountModel.iterator().next();
-            bankAccountModel.setName(name);
-            StormDatabase.getInstance().saveStormModel(bankAccountModel);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Collection<BankAccountModel> accountModel =
+                        StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
+                                .where("id", Where.EQUAL, account.getId())
+                                .limit(1)
+                                .execute()
+                                .join();
+                BankAccountModel bankAccountModel = accountModel.iterator().next();
+                bankAccountModel.setName(name);
+                StormDatabase.getInstance().saveStormModel(bankAccountModel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executorService);
     }
 
-    public void freeze(Account account, boolean freeze) {
+    public CompletableFuture<Void> freeze(Account account, boolean freeze) {
         account.setFrozen(freeze);
 
-        try {
-            Collection<BankAccountModel> accountModel =
-                    StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
-                            .where("id", Where.EQUAL, account.getId())
-                            .limit(1)
-                            .execute()
-                            .join();
-            BankAccountModel bankAccountModel = accountModel.iterator().next();
-            bankAccountModel.setFrozen(freeze);
-            StormDatabase.getInstance().saveStormModel(bankAccountModel);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Collection<BankAccountModel> accountModel =
+                        StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
+                                .where("id", Where.EQUAL, account.getId())
+                                .limit(1)
+                                .execute()
+                                .join();
+                BankAccountModel bankAccountModel = accountModel.iterator().next();
+                bankAccountModel.setFrozen(freeze);
+                StormDatabase.getInstance().saveStormModel(bankAccountModel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executorService);
     }
 
-    public void setBalance(Account account, double balance) {
+    public CompletableFuture<Void> setBalance(Account account, double balance) {
         account.setBalance(balance);
 
-        try {
-            Collection<BankAccountModel> accountModel =
-                    StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
-                            .where("id", Where.EQUAL, account.getId())
-                            .limit(1)
-                            .execute()
-                            .join();
-            BankAccountModel bankAccountModel = accountModel.iterator().next();
-            bankAccountModel.setBalance(balance);
-            StormDatabase.getInstance().saveStormModel(bankAccountModel);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Collection<BankAccountModel> accountModel =
+                        StormDatabase.getInstance().getStorm().buildQuery(BankAccountModel.class)
+                                .where("id", Where.EQUAL, account.getId())
+                                .limit(1)
+                                .execute()
+                                .join();
+                BankAccountModel bankAccountModel = accountModel.iterator().next();
+                bankAccountModel.setBalance(balance);
+                StormDatabase.getInstance().saveStormModel(bankAccountModel);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executorService);
     }
 
     public List<Account> getAccountsFromUser(UUID uuid) {
@@ -140,21 +162,23 @@ public class BankingManager {
         return accounts;
     }
 
-    public void removeUser(Account account, UUID uuid) {
+    public CompletableFuture<Void> removeUser(Account account, UUID uuid) {
         account.getUsers().remove(uuid);
 
-        try {
-            Collection<BankAccountUserModel> accountUserModel =
-                    StormDatabase.getInstance().getStorm().buildQuery(BankAccountUserModel.class)
-                            .where("accountId", Where.EQUAL, account.getId())
-                            .where("uuid", Where.EQUAL, uuid)
-                            .limit(1)
-                            .execute()
-                            .join();
-            StormDatabase.getInstance().getStorm().delete(accountUserModel.iterator().next());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return CompletableFuture.runAsync(() -> {
+            try {
+                Collection<BankAccountUserModel> accountUserModel =
+                        StormDatabase.getInstance().getStorm().buildQuery(BankAccountUserModel.class)
+                                .where("accountId", Where.EQUAL, account.getId())
+                                .where("uuid", Where.EQUAL, uuid)
+                                .limit(1)
+                                .execute()
+                                .join();
+                StormDatabase.getInstance().getStorm().delete(accountUserModel.iterator().next());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, executorService);
     }
 
     public List<Account> getAccountsOfTypeFromUser(UUID uuid, AccountType accountType) {

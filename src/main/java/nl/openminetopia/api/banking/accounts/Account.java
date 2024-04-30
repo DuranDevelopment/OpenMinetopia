@@ -5,6 +5,7 @@ import lombok.Data;
 import nl.openminetopia.api.banking.enums.AccountPermission;
 import nl.openminetopia.api.banking.enums.AccountType;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 

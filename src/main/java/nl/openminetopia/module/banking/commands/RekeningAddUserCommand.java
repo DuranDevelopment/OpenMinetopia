@@ -32,8 +32,13 @@ public class RekeningAddUserCommand extends BaseCommand {
                 return;
             }
         }
-        BankingManager.getInstance().addUser(account, target.getUniqueId(), permission);
-
-        player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol speler <aqua>" + target.getName() + "<dark_aqua> toegevoegd aan de rekening met ID: <aqua>" + id + " <dark_aqua>met de permissie: <aqua>" + permission));
+        BankingManager.getInstance().addUser(account, target.getUniqueId(), permission).whenComplete((aVoid, throwable) -> {
+            if (throwable != null) {
+                player.sendMessage(MessageUtils.format("<red>Er is een fout opgetreden tijdens het toevoegen van de speler aan de rekening."));
+                throwable.printStackTrace();
+                return;
+            }
+            player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol speler <aqua>" + target.getName() + "<dark_aqua> toegevoegd aan de rekening met ID: <aqua>" + id + " <dark_aqua>met de permissie: <aqua>" + permission));
+        });
     }
 }

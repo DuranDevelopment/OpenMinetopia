@@ -23,7 +23,13 @@ public class RekeningFreezeCommand extends BaseCommand {
             return;
         }
 
-        BankingManager.getInstance().freeze(account, freeze);
-        player.sendMessage(MessageUtils.format("<dark_aqua>Rekening met ID: <aqua>" + id + " <dark_aqua>is succesvol " + (freeze ? "bevroren" : "vrijgegeven") + "."));
+        BankingManager.getInstance().freeze(account, freeze).whenComplete((aVoid, throwable) -> {
+            if (throwable != null) {
+                player.sendMessage(MessageUtils.format("<red>Er is een fout opgetreden tijdens het " + (freeze ? "bevriezen" : "vrijgeven") + " van de rekening."));
+                throwable.printStackTrace();
+                return;
+            }
+            player.sendMessage(MessageUtils.format("<dark_aqua>Rekening met ID: <aqua>" + id + " <dark_aqua>is succesvol " + (freeze ? "bevroren" : "vrijgegeven") + "."));
+        });
     }
 }

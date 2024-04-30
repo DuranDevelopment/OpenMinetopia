@@ -23,7 +23,13 @@ public class RekeningDeleteCommand extends BaseCommand {
             return;
         }
 
-        BankingManager.getInstance().deleteAccount(account);
-        player.sendMessage(MessageUtils.format("<dark_aqua>Rekening met ID: <aqua>" + id + " <dark_aqua>is succesvol verwijderd."));
+        BankingManager.getInstance().deleteAccount(account).whenComplete((aVoid, throwable) -> {
+            if (throwable != null) {
+                player.sendMessage(MessageUtils.format("<red>Er is een fout opgetreden tijdens het verwijderen van de rekening."));
+                throwable.printStackTrace();
+                return;
+            }
+            player.sendMessage(MessageUtils.format("<dark_aqua>Rekening met ID: <aqua>" + id + " <dark_aqua>is succesvol verwijderd."));
+        });
     }
 }

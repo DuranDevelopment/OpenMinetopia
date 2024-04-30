@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @CommandAlias("rekening|ohrekening|spaarrekening|bankaccount")
 public class RekeningListCommand extends BaseCommand {
@@ -19,7 +18,10 @@ public class RekeningListCommand extends BaseCommand {
     @CommandPermission("openminetopia.bankaccount.create")
     @Description("Krijg een lijst van bankrekeningen.")
     public void listCommand(Player player, AccountType type, @Optional @Default("1") int page) {
-
+        if (type == AccountType.PRIVATE) {
+            player.sendMessage(MessageUtils.format("<red>Geef een geldig rekening type op."));
+            return;
+        }
 
         int amount = BankingManager.getInstance().getAccountsOfType(type).size();
         int pages = amount / 10 + 1;

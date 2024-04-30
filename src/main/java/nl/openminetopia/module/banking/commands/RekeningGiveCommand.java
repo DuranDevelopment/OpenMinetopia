@@ -23,7 +23,13 @@ public class RekeningGiveCommand extends BaseCommand {
             return;
         }
 
-        BankingManager.getInstance().setBalance(account, account.getBalance() + amount);
-        player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol <aqua>" + amount + "<dark_aqua> toegevoegd aan de rekening met ID: <aqua>" + id));
+        BankingManager.getInstance().setBalance(account, account.getBalance() + amount).whenComplete((aVoid, throwable) -> {
+            if (throwable != null) {
+                player.sendMessage(MessageUtils.format("<red>Er is een fout opgetreden tijdens het toevoegen van geld aan de rekening."));
+                throwable.printStackTrace();
+                return;
+            }
+            player.sendMessage(MessageUtils.format("<dark_aqua>Succesvol <aqua>" + amount + "<dark_aqua> toegevoegd aan de rekening met ID: <aqua>" + id));
+        });
     }
 }
