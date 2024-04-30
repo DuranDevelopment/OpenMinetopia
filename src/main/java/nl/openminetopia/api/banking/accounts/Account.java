@@ -19,4 +19,8 @@ public class Account {
     private boolean frozen;
 
     private Map<UUID, AccountPermission> users;
+
+    public String getFormattedBalance() {
+        return String.format("€ %.2f", balance);
+    }
 }

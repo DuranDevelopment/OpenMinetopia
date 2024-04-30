@@ -58,17 +58,29 @@ public class AccountTypeMenu extends GUIHolder {
         }
 
         if (event.getCurrentItem().getType() == Material.EMERALD_BLOCK) {
-            new AccountSelectionMenu(player, null).open(player);
+            if (BankingManager.getInstance().getAccountsOfTypeFromUser(player.getUniqueId(), AccountType.GOVERNMENT).isEmpty()) {
+                player.sendMessage(MessageUtils.format("<red>Je hebt geen overheidsrekening."));
+                return;
+            }
+            new AccountSelectionMenu(player, AccountType.GOVERNMENT).open(player);
             return;
         }
 
         if (event.getCurrentItem().getType() == Material.DIAMOND_BLOCK) {
-            new AccountSelectionMenu(player, null).open(player);
+            if (BankingManager.getInstance().getAccountsOfTypeFromUser(player.getUniqueId(), AccountType.COMPANY).isEmpty()) {
+                player.sendMessage(MessageUtils.format("<red>Je hebt geen bedrijfsrekening."));
+                return;
+            }
+            new AccountSelectionMenu(player, AccountType.COMPANY).open(player);
             return;
         }
 
         if (event.getCurrentItem().getType() == Material.REDSTONE_BLOCK) {
-            new AccountSelectionMenu(player, null).open(player);
+            if (BankingManager.getInstance().getAccountsOfTypeFromUser(player.getUniqueId(), AccountType.SAVINGS).isEmpty()) {
+                player.sendMessage(MessageUtils.format("<red>Je hebt geen spaarrekening."));
+                return;
+            }
+            new AccountSelectionMenu(player, AccountType.SAVINGS).open(player);
             return;
         }
     }

@@ -2,6 +2,8 @@ package nl.openminetopia.module.banking.menus;
 
 import io.github.bananapuncher714.nbteditor.NBTEditor;
 import nl.openminetopia.api.banking.accounts.Account;
+import nl.openminetopia.api.banking.enums.AccountPermission;
+import nl.openminetopia.api.banking.manager.BankingManager;
 import nl.openminetopia.module.banking.BankingModule;
 import nl.openminetopia.utils.GUIHolder;
 import nl.openminetopia.utils.ItemBuilder;
@@ -25,16 +27,16 @@ public class AccountContentMenu extends GUIHolder {
         this.account = account;
 
         if (account == null) {
-            this.inventory = Bukkit.createInventory(this, 9 * 6, MessageUtils.format("<dark_aqua>Privérekening van " + player.getName()));
             this.balance = BankingModule.getEcon().getBalance(player);
+            this.inventory = Bukkit.createInventory(this, 9 * 6, MessageUtils.format("<dark_aqua>Totale waarde: <aqua>" + balance));
             this.name = player.getName();
             fillInventory(balance);
             return;
         }
 
         this.name = account.getName();
-        this.inventory = Bukkit.createInventory(this, 9 * 6, MessageUtils.format(account.getName()));
         balance = account.getBalance();
+        this.inventory = Bukkit.createInventory(this, 9 * 6, MessageUtils.format("<dark_aqua>Totale waarde: <aqua>" + balance));
         fillInventory(balance);
     }
 
@@ -44,6 +46,11 @@ public class AccountContentMenu extends GUIHolder {
 
         if (event.getCurrentItem() == null) return;
         if (event.getCurrentItem().getType().equals(Material.AIR)) return;
+
+        if (account != null && account.isFrozen()) {
+            player.sendMessage(MessageUtils.format("<red>Deze rekening is bevroren."));
+            return;
+        }
 
         ItemStack item = event.getCurrentItem();
 
@@ -63,6 +70,15 @@ public class AccountContentMenu extends GUIHolder {
             }
             player.getInventory().addItem(moneyItem(item.getType(), singularValue, item.getAmount()));
 
+            // check if player has withdraw permissions:
+            if (account != null) {
+                AccountPermission accountPermission = BankingManager.getInstance().getAccountPermission(account, player.getUniqueId());
+                if (accountPermission != AccountPermission.WITHDRAW && accountPermission != AccountPermission.ADMIN) {
+                    player.sendMessage(MessageUtils.format("<red>Je hebt geen toestemming om geld op te nemen van deze rekening"));
+                    return;
+                }
+            }
+
             setBalance(account, balance - value);
             player.sendMessage(MessageUtils.format("<dark_aqua>Je hebt <aqua>€" + value + " <dark_aqua>opgenomen van de rekening <aqua>" + name));
             new AccountContentMenu(player, account).open(player);
@@ -70,6 +86,15 @@ public class AccountContentMenu extends GUIHolder {
         }
 
         if (NBTEditor.contains(item, "openmt_banking_note")) {
+            // check if player has deposit permissions:
+            if (account != null) {
+                AccountPermission accountPermission = BankingManager.getInstance().getAccountPermission(account, player.getUniqueId());
+                if (accountPermission != AccountPermission.DEPOSIT && accountPermission != AccountPermission.ADMIN) {
+                    player.sendMessage(MessageUtils.format("<red>Je hebt geen toestemming om geld te storten op deze rekening"));
+                    return;
+                }
+            }
+
             if (event.getClick().isLeftClick()) {
                 double value = Double.parseDouble(NBTEditor.getString(item, "openmt_banking_note")) * item.getAmount();
                 item.setAmount(0);

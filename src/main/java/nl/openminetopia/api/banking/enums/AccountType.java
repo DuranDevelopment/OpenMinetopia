@@ -7,10 +7,10 @@ import org.bukkit.Material;
 @Getter
 @AllArgsConstructor
 public enum AccountType {
-    PRIVATE("<gold>Privérekening", Material.GOLD_BLOCK),
-    COMPANY("<aqua>Bedrijfsrekening", Material.DIAMOND_BLOCK),
+    GOVERNMENT("<green>Overheidsrekening", Material.EMERALD_BLOCK),
     SAVINGS("<red>Spaarrekening", Material.REDSTONE_BLOCK),
-    GOVERNMENT("<green>Overheidsrekening", Material.EMERALD_BLOCK),;
+    PRIVATE("<gold>Privérekening", Material.GOLD_BLOCK),
+    COMPANY("<aqua>Bedrijfsrekening", Material.DIAMOND_BLOCK);
 
     private final String name;
     private final Material material;
