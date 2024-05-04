@@ -47,6 +47,7 @@ public class PlotListCommand extends BaseCommand {
 
         List<String> regionList = new ArrayList<>(regionNames);
         for(int i = startIndex; i < endIndex; i++) {
+            if (regionList.get(i).equals("__global__")) continue;
             player.sendMessage(MessageUtils.format("<dark_aqua> - <aqua>" + regionList.get(i)));
         }
 
