@@ -8,3 +8,6 @@ dependencies:
     WorldGuard:
       load: AFTER
       required: true
+    PlaceholderAPI:
+      load: BEFORE
+      required: true

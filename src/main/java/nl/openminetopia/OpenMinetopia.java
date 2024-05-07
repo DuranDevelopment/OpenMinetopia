@@ -8,6 +8,7 @@ import nl.openminetopia.module.banking.BankingModule;
 import nl.openminetopia.module.data.DataModule;
 import nl.openminetopia.module.player.PlayerModule;
 import nl.openminetopia.module.plots.PlotModule;
+import nl.openminetopia.module.scoreboard.ScoreboardModule;
 import nl.openminetopia.utils.WorldGuardUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,7 +38,8 @@ public final class OpenMinetopia extends JavaPlugin {
                 new DataModule(),
                 new PlayerModule(),
                 new BankingModule(),
-                new PlotModule()
+                new PlotModule(),
+                new ScoreboardModule()
         );
 
         commandManager.enableUnstableAPI("help");
